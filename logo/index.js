@@ -1,9 +1,10 @@
 const width = 640
 const height = 640
-const speed = 0
 
 // level of zoom to generate the clusters
-const zoom = 10;
+const zoom = 3;
+
+let speed = 0;
 
 // start processing
 clusterPoints(zoom)
@@ -22,15 +23,25 @@ clusterPoints(zoom)
         .fitExtent([[1, 1], [width - 1, height - 1]], {type: "Sphere"})
         .precision(0.1)
 
-    const polygons = getPolygons(points)
+    let prevPoints = points;
 
-    console.log(polygons.features.length + ' polygons');
+    setInterval(function() {
 
-    showSVG(polygons, projection)
+      prevPoints = getPoints(prevPoints)
+      const polygons = getPolygons(prevPoints)
+
+      // earth rotation
+      let rotation = speed ? (Date.now() / (201-speed) ) : projection.rotate()[0]
+      projection.rotate([rotation, projection.rotate()[1]]);
+
+      // draw SVG
+      showSVG(polygons, projection)
+
+      // console.log(polygons.features.length + ' polygons');
+    }, 10);
 
   })
   .catch( error => console.error(error) )
-
 
 function showSVG(polygons, projection) {
 
@@ -40,19 +51,28 @@ function showSVG(polygons, projection) {
   d3.select(canvas)
      .attr('width', width)
      .attr('height', height)
+     .on('click', d => console.log('click') )
 
   const path = d3.geoPath(projection, context).pointRadius(1);
 
+  d3.select('#speed')
+    .on('input', function(a)  {
+      speed = this.value
+      d3.select('#speedValue').html(speed)
+    })
+
   polygons.features.forEach((p, i) => {
+
     context.beginPath();
     path(p);
     context.strokeStyle = context.fillStyle = p.properties.site[2];
-    context.lineWidth = .5;
+    context.lineWidth = 1;
     context.fill();
     context.stroke();
 
   });
 }
+
 function getColorScale(stations) {
   // colors
   const counts = stations.map( d => d.count)
@@ -63,24 +83,24 @@ function getColorScale(stations) {
     .interpolator(d3.interpolatePuBu)
 }
 
-function getPolygons(points) {
-
+function getPoints(points) {
   // perturbation
   const brownianNoise = Math.random();
   const perturbation = points.map(_ => [0, 0]);
 
-  let noisePoints = points.map((d, i) => {
+  return points.map((d, i) => {
       perturbation[i][0] += speed/10 * brownianNoise;
       perturbation[i][1] += speed/10 * brownianNoise;
       return [
-        d[0] + perturbation[i][0],
+        (d[0] + perturbation[i][0]),
         (d[1] + perturbation[i][1]),
         d[2]
       ];
     })
+}
 
+function getPolygons(points) {
   let voronoi = d3.geoVoronoi(points);
-
   return {
     type: "FeatureCollection",
     features: voronoi.polygons().features
