@@ -4,11 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "cluster": "node cluster.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Clement Renaud",
   "license": "ISC",
   "dependencies": {
+    "canvas": "^2.3.0",
+    "d3": "^5.7.0",
+    "d3-geo-voronoi": "^1.1.2",
+    "d3-node": "^2.1.0",
     "jsonfile": "^5.0.0",
     "shapefile": "^0.6.6",
     "supercluster": "^5.0.0"

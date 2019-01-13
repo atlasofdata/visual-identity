@@ -2,26 +2,34 @@
 
 Generate a voronoi of the world based on existing weather stations.
 
-## Dataset
+See the [online version](https://beta.observablehq.com/d/51e18c29fee22dee).
 
-*WorldClim: Global weather stations* on  [Databasin]( http://databasin.org/datasets/15a31dec689b4c958ee491ff30fcce75)
 
+## Weather Station Dataset
+
+> *WorldClim: Global weather stations*
+>
 > Robert J. Hijmans, Susan Cameron, and Juan Parra, at the Museum of Vertebrate Zoology, University of California, Berkeley, in collaboration with Peter Jones and Andrew Jarvis (CIAT), and with Karen Richardson (Rainforest CRC).
+>
+> available on [Databasin]( http://databasin.org/datasets/15a31dec689b4c958ee491ff30fcce75)
+
+## Build
+
+Open Weather Station Shapefile, clusterize and save as GeoJson
 
 ```
+npm run cluster
+```
 
-https://beta.observablehq.com/d/51e18c29fee22dee
+
+
 
 
 ## Animated
 
-
-
-
 ## Sizes
 
 Generate differents sizes
-
 
 ## Favicon
 
@@ -33,9 +41,7 @@ Rasterize image [`ln` The 3D Line Art Engine](https://github.com/fogleman/ln)
 
 https://www.bibliotecapleyades.net/mapas_ocultotierra/esp_mapa_ocultotierra_12.htm
 
-
 http://rreusser.github.io/pulsar/
-
 
 https://beta.observablehq.com/@fil/spherical-lloyds-relaxation
 
