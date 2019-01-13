@@ -1,20 +1,14 @@
-const d3 = require('d3');
-const geoVoronoi = require('d3-geo-voronoi')
-const cluster = require('./cluster')
-
-//
 const width = 640
 const height = 640
 const speed = 0
 
 // level of zoom to generate the clusters
-const zoom = 6;
+const zoom = 10;
 
 // start processing
-cluster.clusterPoints(zoom)
+clusterPoints(zoom)
   .then( clusters => {
     console.log(clusters.length + ' results after clustering at z' + zoom);
-    // cluster.saveJson('stations.json', clusters)
 
     const colorScale = getColorScale(clusters);
 
@@ -32,15 +26,37 @@ cluster.clusterPoints(zoom)
 
     console.log(polygons.features.length + ' polygons');
 
-
+    showSVG(polygons, projection)
 
   })
   .catch( error => console.error(error) )
 
+
+function showSVG(polygons, projection) {
+
+  var canvas = document.querySelector("canvas"),
+      context = canvas.getContext("2d");
+
+  d3.select(canvas)
+     .attr('width', width)
+     .attr('height', height)
+
+  const path = d3.geoPath(projection, context).pointRadius(1);
+
+  polygons.features.forEach((p, i) => {
+    context.beginPath();
+    path(p);
+    context.strokeStyle = context.fillStyle = p.properties.site[2];
+    context.lineWidth = .5;
+    context.fill();
+    context.stroke();
+
+  });
+}
 function getColorScale(stations) {
   // colors
   const counts = stations.map( d => d.count)
-  const domain =  [ d3.min(counts), d3.max(counts) ] // : [ d3.max(counts), d3.min(counts) ]
+  const domain =  [ d3.max(counts), d3.min(counts) ]
 
   return d3.scaleSequential()
     .domain(domain)
@@ -63,10 +79,54 @@ function getPolygons(points) {
       ];
     })
 
-  let voronoi = geoVoronoi.geoVoronoi(points);
+  let voronoi = d3.geoVoronoi(points);
 
   return {
     type: "FeatureCollection",
     features: voronoi.polygons().features
   }
+}
+
+function clusterPoints(zoom) {
+  return new Promise(function(resolve, reject) {
+    const points = []
+
+    shapefile.openShp("./stations1.shp")
+      .then(source => source.read()
+        .then(function log(result) {
+
+          if (!result.done) {
+
+            let point = {
+                  "type": "Feature",
+                  "geometry": result.value
+                }
+
+            points.push(point)
+          } else {
+
+            const index = new Supercluster({
+              log: true,
+              radius: 60,
+              extent: 256,
+              maxZoom: 17
+            })
+            .load(points);
+
+            const clusters = index.getClusters([-180, -180, 180, 180], zoom)
+
+            const minify = clusters.map( d => ({
+                'coords' : d.geometry.coordinates,
+                'count' : d.properties ? d.properties.point_count : 1
+              }))
+
+            resolve(minify)
+            return
+          }
+
+          return source.read().then(log);
+        }))
+      .catch(error => reject(error.stack));
+
+  })
 }

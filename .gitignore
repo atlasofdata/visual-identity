@@ -1,8 +1,13 @@
+
 .DS_Store
 refs
 *.shp
 *.zip
 WorldClim_*
+
+clusters.geo.json
+twitter-mockup.jpg
+stations.json
 
 # node
 node_modules
