@@ -2,27 +2,43 @@ const width = 640
 const height = 640
 
 // level of zoom to generate the clusters
-let zoom = 0;
+let zoom = 1;
 let speed = 0;
+let treshold = 100;
 
 
 // start processing
 getClusters()
   .then( allClusters => {
 
-    let points = getCluster(allClusters, zoom)
+    let cluster = getCluster(allClusters, zoom)
+    let points = getPoints(cluster)
+
+
+    // UI stuff
+    d3.select('canvas')
+       .attr('width', width)
+       .attr('height', height)
+       .on('click', d => console.log('click') )
 
     d3.select('#zoom')
       .on('input', function(a)  {
         zoom = this.value
         d3.select('#zoomValue').html(zoom)
-        points = getCluster(allClusters, zoom)
+        let cluster = getCluster(allClusters, zoom)
+        points = getPoints(cluster)
       })
 
     d3.select('#speed')
       .on('input', function(a)  {
         speed = this.value
         d3.select('#speedValue').html(speed)
+      })
+
+    d3.select('#treshold')
+      .on('input', function(a)  {
+        treshold = this.value
+        d3.select('#tresholdValue').html(treshold)
       })
 
     // initial geo projection
@@ -32,15 +48,21 @@ getClusters()
         .fitExtent([[1, 1], [width - 1, height - 1]], {type: "Sphere"})
         .precision(0.1)
 
-
     setInterval(function() {
 
-      points = getPoints(points)
+      const colorScale = getColorScale(points);
+      points = getPoints(points).map(d => [
+        d[0],
+        d[1],
+        d[2],
+        d[2] > treshold ? colorScale(d[2]) : 'transparent'
+      ])
+
       const polygons = getPolygons(points)
 
       // earth rotation
-      let rotation = speed ? (Date.now() / speed ) : 0
-      projection.rotate([rotation, projection.rotate()[1]]);
+      // let rotation = speed ? (Date.now() / speed ) : 0
+      // projection.rotate([rotation, projection.rotate()[1]]);
 
       // draw SVG
       showSVG(polygons, projection)
@@ -56,28 +78,26 @@ function showSVG(polygons, projection) {
   var canvas = document.querySelector("canvas"),
       context = canvas.getContext("2d");
 
-  d3.select(canvas)
-     .attr('width', width)
-     .attr('height', height)
-     .on('click', d => console.log('click') )
+  // clear canvas
+	context.fillStyle = '#fff';
+	context.fillRect(0, 0, width, height);
 
   const path = d3.geoPath(projection, context).pointRadius(1);
 
   polygons.features.forEach((p, i) => {
-
     context.beginPath();
     path(p);
-    context.strokeStyle = context.fillStyle = p.properties.site[2];
+    context.strokeStyle = context.fillStyle = p.properties.site[3];
     context.lineWidth = 1;
     context.fill();
     context.stroke();
-
   });
 }
 
-function getColorScale(stations) {
+function getColorScale(points) {
+
   // colors
-  const counts = stations.map( d => d.count)
+  const counts = points.map( d => d[2])
   const domain =  [ d3.max(counts), d3.min(counts) ]
 
   return d3.scaleSequential()
@@ -119,11 +139,12 @@ function getCluster(allClusters, zoom) {
 
   console.log(clusters.length + ' results after clustering at z' + zoom);
 
-  // points
-  const colorScale = getColorScale(clusters);
-  const points = clusters.map((d,i) => [d.coords[0], d.coords[1],  colorScale(d.count)])
-
-  return points
+  return clusters.map((d,i) => [
+    d.coords[0],
+    d.coords[1],
+    d.count,
+    'rgb(0,0,0)'
+  ])
 }
 
 function getClusters() {
