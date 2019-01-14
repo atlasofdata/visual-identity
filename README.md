@@ -10,15 +10,6 @@ Documentation and guidelines for the VI of The Atlas of Data
 - social : @atlasofdata
 - website : http://theatlasofdata.earth
 
-## Guidelines
-
-General mood of the project : serious, cosmic, modern, yet accessible (not cryptic)
-
-Focus on scientific credibility and modern tone.
-Emphasize reliable and give space for content.
-
-Not too geeky, also should be accessible - esp. appeals to designers.
-
 ## Logo
 
 Info about the logo in [`logo`](./logo).
