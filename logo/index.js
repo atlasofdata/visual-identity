@@ -4,76 +4,95 @@ const height = 640
 // level of zoom to generate the clusters
 let zoom = 1;
 let speed = 0;
-let treshold = 100;
 
+let fill = false;
+let colors = false;
 
-// start processing
+let clusters = []; // cluster data from map
+let cluster = []; // cluster data from map
+let points = []; // parsed with colors and info
+
+let loaded = false;
+// initial geo projection
+const projection = d3.geoAzimuthalEqualArea()
+    .rotate([180, -90])
+    .translate([width / 2, height / 2])
+    .fitExtent([[1, 1], [width - 1, height - 1]], {type: "Sphere"})
+    .precision(0.1)
+
+// UI stuff
+d3.select('canvas')
+   .attr('width', width)
+   .attr('height', height)
+   .on('click', d => console.log('click') )
+
+d3.select('#zoom')
+  .on('input', function(a)  {
+    zoom = this.value
+    d3.select('#zoomValue').html(zoom)
+    init()
+  })
+
+d3.select('#speed')
+  .on('input', function(a)  {
+    speed = this.value
+    d3.select('#speedValue').html(speed)
+  })
+
+d3.selectAll('input[type="radio"]')
+  .on("change", function(a)  {
+    if(this.value == 'fill') { fill = true; colors = true }
+    else if(this.value == 'colors') { fill = false; colors = false }
+  });
+
+d3.select("#init")
+  .on("click", function(a)  {
+    speed = 0;
+    zoom = 0;
+    init();
+  });
+
+// drawing loop
+setInterval(function() {
+  if (loaded) update()
+}, 25 );
+
+function init() {
+  cluster = getCluster(clusters, zoom);
+  points = getPoints(cluster);
+}
+
+// get data and start processing things
 getClusters()
   .then( allClusters => {
-
-    let cluster = getCluster(allClusters, zoom)
-    let points = getPoints(cluster)
-
-
-    // UI stuff
-    d3.select('canvas')
-       .attr('width', width)
-       .attr('height', height)
-       .on('click', d => console.log('click') )
-
-    d3.select('#zoom')
-      .on('input', function(a)  {
-        zoom = this.value
-        d3.select('#zoomValue').html(zoom)
-        let cluster = getCluster(allClusters, zoom)
-        points = getPoints(cluster)
-      })
-
-    d3.select('#speed')
-      .on('input', function(a)  {
-        speed = this.value
-        d3.select('#speedValue').html(speed)
-      })
-
-    d3.select('#treshold')
-      .on('input', function(a)  {
-        treshold = this.value
-        d3.select('#tresholdValue').html(treshold)
-      })
-
-    // initial geo projection
-    const projection = d3.geoAzimuthalEqualArea()
-        .rotate([180, -90])
-        .translate([width / 2, height / 2])
-        .fitExtent([[1, 1], [width - 1, height - 1]], {type: "Sphere"})
-        .precision(0.1)
-
-    setInterval(function() {
-
-      const colorScale = getColorScale(points);
-      points = getPoints(points).map(d => [
-        d[0],
-        d[1],
-        d[2],
-        d[2] > treshold ? colorScale(d[2]) : 'transparent'
-      ])
-
-      const polygons = getPolygons(points)
-
-      // earth rotation
-      // let rotation = speed ? (Date.now() / speed ) : 0
-      // projection.rotate([rotation, projection.rotate()[1]]);
-
-      // draw SVG
-      showSVG(polygons, projection)
-
-      // console.log(polygons.features.length + ' polygons');
-    }, (Date.now() / (501-speed)) );
-
+    clusters = allClusters;
+    init();
+    loaded = true;
   })
   .catch( error => console.error(error) )
 
-function showSVG(polygons, projection) {
+function update() {
+
+  const colorScale = getColorScale(points);
+  points = getPoints(points)
+    .map(d => [
+      d[0],
+      d[1],
+      d[2],
+      d[2] > colorScale(d[2])
+    ])
+
+  const polygons = getPolygons(points)
+
+  // earth rotation
+  // let rotation = speed ? (Date.now() / speed ) : 0
+  // projection.rotate([rotation, projection.rotate()[1]]);
+
+  // draw SVG
+  draw(polygons, projection)
+}
+
+function draw(polygons, projection) {
 
   var canvas = document.querySelector("canvas"),
       context = canvas.getContext("2d");
@@ -87,9 +106,9 @@ function showSVG(polygons, projection) {
   polygons.features.forEach((p, i) => {
     context.beginPath();
     path(p);
-    context.strokeStyle = context.fillStyle = p.properties.site[3];
+    context.strokeStyle = context.fillStyle = (colors || fill) ? p.properties.site[3] : '#555';
     context.lineWidth = 1;
-    context.fill();
+    if (fill) context.fill();
     context.stroke();
   });
 }

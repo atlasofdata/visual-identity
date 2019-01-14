@@ -1,29 +1,63 @@
 <!DOCTYPE html>
+<style>
+  #controls {
+    position: fixed;
+    width: 200px;
+  }
+
+  #radios label {
+    display: inline-block;
+    margin: 1em 0;
+  }
+
+  label, input[type="button"] {
+    display : block
+  }
+
+  canvas {
+    margin-left: 150px;
+  }
+</style>
+
+<body>
+  <h1>The Atlas of Data</h1>
+  <div id="controls">
+
+    <div>
+      <label for="zoom">Zoom Level (<span id="zoomValue">1</span>)</label>
+      <input type="range" min="0" max="5" value="1" class="slider" id="zoom">
+    </div>
+
+    <div>
+      <label for="speed">Speed (<span id="speedValue">0</span>)</label>
+      <input type="range" min="0" max="50" value="0" class="slider" id="speed">
+    </div>
+
+    <div id="radios">
+      <label for="fill">
+        <input type="radio" value="fill" name="fillSelect" id="fill">
+        fill
+      </label>
+      <label for="colors">
+        <input type="radio" value="colors" name="fillSelect"  id="colors">
+        outline
+      </label>
+    </div>
+
+    <input id="init" name="initButton" type="button" value="Init" />
+  </div>
+
+
+  <canvas></canvas>
+
+</body>
+
 <script src="https://unpkg.com/shapefile@0.6"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js"></script>
+<script src="https://unpkg.com/d3@5"></script>
 <script src="https://unpkg.com/d3-delaunay@4"></script>
 <script src="https://unpkg.com/d3-geo-voronoi@1"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/supercluster@5.0.0/dist/supercluster.min.js"></script>
 
 <script src="index.js"></script>
-
-<body>
-  <div>
-    <label for="zoom">Zoom Level (<span id="zoomValue">1</span>)</label>
-    <input type="range" min="0" max="5" value="1" class="slider" id="zoom">
-  </div>
-
-  <div>
-    <label for="treshold">Color Treshold (<span id="tresholdValue">100</span>)</label>
-    <input type="range" min="0" max="5000" value="100" class="slider" id="treshold" width="100%">
-  </div>
-
-  <div>
-    <label for="speed">Speed (<span id="speedValue">0</span>)</label>
-    <input type="range" min="0" max="50" value="0" class="slider" id="speed">
-  </div>
-
-  <canvas></canvas>
-</body>
