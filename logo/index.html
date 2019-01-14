@@ -10,9 +10,16 @@
 <script src="index.js"></script>
 
 <body>
+  <div>
+    <label for="zoom">Zoom Level (<span id="zoomValue">0</span>)</label>
+    <input type="range" min="0" max="5" value="0" class="slider" id="zoom">
+    <span id="zoomValue"></span>
+  </div>
+
 <div>
-  <input type="range" min="0" max="100" value="0" class="slider" id="speed">
-  <span id="speedValue"></span>
+  <label for="speed">Speed (<span id="speedValue">0</span>)</label>
+  <input type="range" min="0" max="50" value="0" class="slider" id="speed">
 </div>
+
 <canvas></canvas>
 </body>

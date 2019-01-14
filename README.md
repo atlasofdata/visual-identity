@@ -12,7 +12,7 @@ Documentation and guidelines for the VI of The Atlas of Data
 
 ## Logo
 
-Info about the logo in [`logo`](./logo).
+Info about the logo in the [`logo`](./logo) folder.
 
 #### Logotype / wordmark
 
