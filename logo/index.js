@@ -5,7 +5,7 @@ const height = 640
 let zoom = 1;
 let speed = 0;
 
-let fill = false;
+let fill = true;
 let colors = false;
 
 let clusters = []; // cluster data from map
@@ -13,6 +13,7 @@ let cluster = []; // cluster data from map
 let points = []; // parsed with colors and info
 
 let loaded = false;
+let colorScale;
 // initial geo projection
 const projection = d3.geoAzimuthalEqualArea()
     .rotate([180, -90])
@@ -60,6 +61,8 @@ setInterval(function() {
 function init() {
   cluster = getCluster(clusters, zoom);
   points = getPoints(cluster);
+
+  colorScale = getColorScale(points);
 }
 
 // get data and start processing things
@@ -73,13 +76,12 @@ getClusters()
 
 function update() {
 
-  const colorScale = getColorScale(points);
   points = getPoints(points)
     .map(d => [
       d[0],
       d[1],
       d[2],
-      d[2] > colorScale(d[2])
+      colorScale(d[2])
     ])
 
   const polygons = getPolygons(points)
