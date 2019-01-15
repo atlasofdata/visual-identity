@@ -45,10 +45,15 @@
     </div>
 
     <input id="init" name="initButton" type="button" value="Init" />
+    <input id="stop" name="stopButton" type="button" value="stop" />
+    <input id="play" name="playButton" type="button" value="play" />
+
+    <br />
+    <input id="save" name="saveButton" type="button" value="save" />
   </div>
 
 
-  <canvas></canvas>
+  <canvas id="canvas"></canvas>
 
 </body>
 
@@ -57,6 +62,9 @@
 <script src="https://unpkg.com/d3@5"></script>
 <script src="https://unpkg.com/d3-delaunay@4"></script>
 <script src="https://unpkg.com/d3-geo-voronoi@1"></script>
+<script src="https://unpkg.com/d3-geo-projection@2.4.1"></script>
+<script src="https://unpkg.com/d3-geo-polygon"></script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/supercluster@5.0.0/dist/supercluster.min.js"></script>
 

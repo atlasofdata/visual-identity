@@ -14,12 +14,32 @@ let points = []; // parsed with colors and info
 
 let loaded = false;
 let colorScale;
+
+// const projs = [
+//   'AzimuthalEqualArea',
+//   'AzimuthalEquidistant', // UN
+//   'PierceQuincuncial', // square thanx to Pierce !
+//   'Berghaus', // star
+//   'Bertin1953', // WARN : remove rotate
+//   'RectangularPolyconic', // UK War Office
+//   'Wiechel',
+//   'Stereographic'
+// ]
+
 // initial geo projection
-const projection = d3.geoAzimuthalEqualArea()
+const projection =
+  // d3.geoAzimuthalEqualArea()
+  // d3.geoAzimuthalEquidistant() // UN
+  d3.geoPierceQuincuncial() // square thanx to Pierce !
+  // d3.geoBerghaus() // star
+  // d3.geoBertin1953() // WARN : remove rotate
+  // d3.geoRectangularPolyconic() // UK War Office
+  // d3.geoWiechel()
+  // d3.geoStereographic()
     .rotate([180, -90])
     .translate([width / 2, height / 2])
     .fitExtent([[1, 1], [width - 1, height - 1]], {type: "Sphere"})
-    .precision(0.1)
+    // .precision(1)
 
 // UI stuff
 d3.select('canvas')
@@ -49,8 +69,28 @@ d3.selectAll('input[type="radio"]')
 d3.select("#init")
   .on("click", function(a)  {
     speed = 0;
-    zoom = 0;
+    zoom = 1;
     init();
+  });
+
+let prevSpeed = 0;
+d3.select("#stop")
+  .on("click", function(a)  {
+    prevSpeed = speed;
+    speed = 0;
+  });
+
+d3.select("#play")
+  .on("click", function(a)  {
+    speed = prevSpeed;
+  });
+
+d3.select("#save")
+  .on("click", function(a)  {
+    const c = d3.select('canvas').node();
+    const d = c.toDataURL("image/png");
+    const w = window.open('about:blank','image from canvas');
+    w.document.write("<img src='" + d + "' alt='from canvas'/>");
   });
 
 // drawing loop
