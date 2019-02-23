@@ -2,7 +2,7 @@
 
 Generate a voronoi of the world based on existing weather stations.
 
-See the [online version](https://beta.observablehq.com/d/51e18c29fee22dee).
+See the [online version](https://beta.observablehq.com/d/51e18c29fee22dee) also a more [basic square](https://beta.observablehq.com/@clemsos/rotating-box-in-a-circle) attempt.
 
 
 ## Weather Station Dataset
