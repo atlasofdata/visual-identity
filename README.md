@@ -12,7 +12,9 @@ Documentation and guidelines for the VI of The Atlas of Data
 
 ## Logo
 
-Info about the logo in the [`logo`](./logo) folder.
+![](./logo/atlas-voronoi-logo.png)
+
+Check the [online generator](https://observablehq.com/@clemsos/simple-voronoi) or read about logo experiments in the [`logo`](./logo) folder.
 
 #### Logotype / wordmark
 
